@@ -5,7 +5,7 @@
       "name": "80 Robux",
       "price": 0.99,
       "amount": 80,
-      "image": "https://via.placeholder.com/150?text=80+Robux",
+      "image": "https://placehold.co/150x150?text=80+Robux",
       "description": "A small top-up of 80 Robux - perfect for a single avatar accessory.",
       "stock": "200"
     },
@@ -14,7 +14,7 @@
       "name": "400 Robux",
       "price": 4.99,
       "amount": 400,
-      "image": "https://via.placeholder.com/150?text=400+Robux",
+      "image": "https://placehold.co/150x150?text=400+Robux",
       "description": "A starter pack of 400 Robux for avatar items and game passes",
       "stock": "120"
     },
@@ -23,7 +23,7 @@
       "name": "800 Robux",
       "price": 9.99,
       "amount": 800,
-      "image": "https://via.placeholder.com/150?text=800+Robux",
+      "image": "https://placehold.co/150x150?text=800+Robux",
       "description": "800 Robux - Great for premium avatar bundles.",
       "stock": "85"
     },
@@ -32,7 +32,7 @@
       "name": "1700 Robux",
       "price": 19.99,
       "amount": 1700,
-      "image": "https://via.placeholder.com/150?text=1700+Robux",
+      "image": "https://placehold.co/150x150?text=1700+Robux",
       "description": "",
       "stock": "40"
     },
@@ -41,7 +41,7 @@
       "name": "4500 Robux",
       "price": 49.99,
       "amount": 4500,
-      "image": "https://via.placeholder.com/150?text=4500+Robux",
+      "image": "https://placehold.co/150x150?text=4500+Robux",
       "description": "A large bundle of 4500 Robux for power users and collectors.",
       "stock": "15"
     }
