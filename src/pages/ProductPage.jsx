@@ -1,120 +1,83 @@
-import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
-import ErrorMessage from "./ErrorMessage";
-import Loading from "./Loading";
+// pages/ProductPage.jsx
+// Shows a single Robux package's details, with an edit form to update it.
 
-function ProductPage() {
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import ProductForm from "../components/ProductForm";
+import Loading from "../components/Loading";
+import ErrorMessage from "../components/ErrorMessage";
+import { getProduct, updateProduct, deleteProduct } from "../api/products";
+
+export default function ProductPage() {
   const { id } = useParams();
+  const navigate = useNavigate();
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
   const [isEditing, setIsEditing] = useState(false);
-  const [newPrice, setNewPrice] = useState("");
-  const [saving, setSaving] = useState(false);
-  const [saveError, setSaveError] = useState(null);
 
   useEffect(() => {
     async function fetchProduct() {
+      setLoading(true);
+      setError(null);
       try {
-        const response = await fetch(`http://localhost:3001/products/${id}`);
-        if (!response.ok) {
-          throw new Error("Product not found");
-        }
-        const data = await response.json();
+        const data = await getProduct(id);
         setProduct(data);
-        setNewPrice(data.price);
       } catch (err) {
         setError(err.message);
       } finally {
         setLoading(false);
       }
     }
-
     fetchProduct();
   }, [id]);
 
-  function handleEditClick() {
-    setIsEditing(true);
-    setNewPrice(product.price);
-    setSaveError(null);
-  }
-
-  function handleCancelClick() {
-    setIsEditing(false);
-    setNewPrice(product.price);
-    setSaveError(null);
-  }
-
-  async function handleSaveClick() {
-    setSaving(true);
-    setSaveError(null);
+  async function handleUpdate(updates) {
     try {
-      const response = await fetch(`http://localhost:3001/products/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ price: parseFloat(newPrice) }),
-      });
-      if (!response.ok) {
-        throw new Error("Failed to update price");
-      }
-      const updatedProduct = await response.json();
-      setProduct(updatedProduct);
+      const updated = await updateProduct(id, updates);
+      setProduct(updated);
       setIsEditing(false);
     } catch (err) {
-      setSaveError(err.message);
-    } finally {
-      setSaving(false);
+      alert(`Failed to update package: ${err.message}`);
     }
   }
 
-  if (loading) {
-    return <Loading />;
+  async function handleDelete() {
+    if (!window.confirm("Delete this package?")) return;
+    try {
+      await deleteProduct(id);
+      navigate("/products");
+    } catch (err) {
+      alert(`Failed to delete package: ${err.message}`);
+    }
   }
 
-  if (error) {
-    return <ErrorMessage message={error} />;
-  }
+  if (loading) return <Loading />;
+  if (error) return <ErrorMessage message={error} />;
+  if (!product) return <ErrorMessage message="Package not found" />;
 
   return (
     <div className="product-page">
-      <h1>{product.name}</h1>
-      <img src={product.image} alt={product.name} />
-      <p>{product.description}</p>
-
-      {!isEditing ? (
+      {isEditing ? (
         <>
-          <p>Price: ${product.price}</p>
-          <button onClick={handleEditClick}>Edit Price</button>
+          <h1>Edit {product.name}</h1>
+          <ProductForm initialData={product} onSubmit={handleUpdate} submitLabel="Save Changes" />
+          <button onClick={() => setIsEditing(false)}>Cancel</button>
         </>
       ) : (
-        <div className="price-edit-form">
-          <label htmlFor="price-input">New Price: $</label>
-          <input
-            id="price-input"
-            type="number"
-            step="0.01"
-            min="0"
-            value={newPrice}
-            onChange={(e) => setNewPrice(e.target.value)}
-          />
-          <div className="price-edit-buttons">
-            <button onClick={handleSaveClick} disabled={saving}>
-              {saving ? "Saving..." : "Save"}
-            </button>
-            <button onClick={handleCancelClick} disabled={saving}>
-              Cancel
-            </button>
+        <>
+          <img src={product.image} alt={product.name} />
+          <h1>{product.name}</h1>
+          <p className="price">${product.price.toFixed(2)}</p>
+          <p>{product.description}</p>
+          <p className="stock">{product.stock} in stock</p>
+          <div className="product-actions">
+            <button onClick={() => setIsEditing(true)}>Edit</button>
+            <button onClick={handleDelete}>Delete</button>
           </div>
-          {saveError && <ErrorMessage message={saveError} />}
-        </div>
+        </>
       )}
-
-      <p>Amount: {product.amount} Robux</p>
-      <p>Stock: {product.stock}</p>
     </div>
   );
 }
-
-export default ProductPage;
