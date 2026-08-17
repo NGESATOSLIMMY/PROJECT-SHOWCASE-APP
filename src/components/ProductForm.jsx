@@ -1,143 +1,91 @@
+// components/ProductForm.jsx
+// Shared form for both creating a new Robux package and editing an existing one.
 
- import { useId, useState } from "react";
+import { useState } from "react";
 
-function ProductForm({ onSubmit }) {
-  const nameId = useId();
-  const descriptionId = useId();
-  const priceId = useId();
-  const stockId = useId();
-  const imageId = useId();
+const emptyProduct = {
+  name: "",
+  price: "",
+  amount: "",
+  description: "",
+  stock: "",
+  image: "",
+};
 
-  const [formData, setFormData] = useState({
-    name: "",
-    description: "",
-    price: "",
-    stock: "",
-    image: "",
-  });
+export default function ProductForm({ initialData, onSubmit, submitLabel = "Save" }) {
+  const [formData, setFormData] = useState(initialData || emptyProduct);
+  const [errors, setErrors] = useState({});
 
-  const handleChange = (event) => {
-    const { name, value } = event.target;
+  function handleChange(e) {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  }
 
-    setFormData((previousData) => ({
-      ...previousData,
-      [name]: value,
-    }));
-  };
+  function validate() {
+    const newErrors = {};
+    if (!formData.name.trim()) newErrors.name = "Name is required";
+    if (!formData.price || Number(formData.price) <= 0)
+      newErrors.price = "Price must be a positive number";
+    if (!formData.amount || Number(formData.amount) <= 0)
+      newErrors.amount = "Robux amount must be a positive number";
+    if (formData.stock === "" || Number(formData.stock) < 0)
+      newErrors.stock = "Stock must be 0 or more";
+    return newErrors;
+  }
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-
-    const newProduct = {
-      name: formData.name,
-      description: formData.description,
+  function handleSubmit(e) {
+    e.preventDefault();
+    const validationErrors = validate();
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+    setErrors({});
+    onSubmit({
+      ...formData,
       price: Number(formData.price),
+      amount: Number(formData.amount),
       stock: Number(formData.stock),
-      image: formData.image,
-    };
-
-    await onSubmit(newProduct);
-
-    setFormData({
-      name: "",
-      description: "",
-      price: "",
-      stock: "",
-      image: "",
     });
-  };
+  }
 
   return (
     <form className="product-form" onSubmit={handleSubmit}>
-      <h1>Add New Product</h1>
+      <label>
+        Name
+        <input type="text" name="name" value={formData.name} onChange={handleChange} placeholder="e.g. 800 Robux" />
+        {errors.name && <span className="field-error">{errors.name}</span>}
+      </label>
 
-      <div className="form-group">
-        <label htmlFor={nameId}>
-          Product Name
-        </label>
+      <label>
+        Price ($)
+        <input type="number" step="0.01" name="price" value={formData.price} onChange={handleChange} placeholder="e.g. 9.99" />
+        {errors.price && <span className="field-error">{errors.price}</span>}
+      </label>
 
-        <input
-          id={nameId}
-          name="name"
-          type="text"
-          value={formData.name}
-          onChange={handleChange}
-          placeholder="Enter product name"
-          required
-        />
-      </div>
+      <label>
+        Robux Amount
+        <input type="number" name="amount" value={formData.amount} onChange={handleChange} placeholder="e.g. 800" />
+        {errors.amount && <span className="field-error">{errors.amount}</span>}
+      </label>
 
-      <div className="form-group">
-        <label htmlFor={descriptionId}>
-          Description
-        </label>
+      <label>
+        Stock
+        <input type="number" name="stock" value={formData.stock} onChange={handleChange} placeholder="e.g. 100" />
+        {errors.stock && <span className="field-error">{errors.stock}</span>}
+      </label>
 
-        <textarea
-          id={descriptionId}
-          name="description"
-          value={formData.description}
-          onChange={handleChange}
-          placeholder="Enter product description"
-          required
-        />
-      </div>
+      <label>
+        Image URL
+        <input type="text" name="image" value={formData.image} onChange={handleChange} placeholder="https://..." />
+      </label>
 
-      <div className="form-group">
-        <label htmlFor={priceId}>
-          Price
-        </label>
+      <label>
+        Description
+        <textarea name="description" value={formData.description} onChange={handleChange} placeholder="Short description of this package" />
+      </label>
 
-        <input
-          id={priceId}
-          name="price"
-          type="number"
-          min="0"
-          step="0.01"
-          value={formData.price}
-          onChange={handleChange}
-          placeholder="0.00"
-          required
-        />
-      </div>
-
-      <div className="form-group">
-        <label htmlFor={stockId}>
-          Stock
-        </label>
-
-        <input
-          id={stockId}
-          name="stock"
-          type="number"
-          min="0"
-          value={formData.stock}
-          onChange={handleChange}
-          placeholder="Enter stock quantity"
-          required
-        />
-      </div>
-
-      <div className="form-group">
-        <label htmlFor={imageId}>
-          Image URL
-        </label>
-
-        <input
-          id={imageId}
-          name="image"
-          type="url"
-          value={formData.image}
-          onChange={handleChange}
-          placeholder="https://example.com/image.jpg"
-          required
-        />
-      </div>
-
-      <button type="submit">
-        Add Product
-      </button>
+      <button type="submit">{submitLabel}</button>
     </form>
   );
 }
-
-export default ProductForm;
