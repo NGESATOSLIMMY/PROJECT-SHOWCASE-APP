@@ -2,7 +2,7 @@ import React from 'react';
 
 export default function ProductListPage() {
   const products = [
-    { id: 1, amount: '800 Robux', price: '$9.99' },
+    { id: 1, amount: '800 Robux', price: '$7.99' },
     { id: 2, amount: '2,000 Robux', price: '$24.99' },
     { id: 3, amount: '4,500 Robux', price: '$49.99' },
     { id: 4, amount: '10,000 Robux', price: '$99.99' },
@@ -18,7 +18,7 @@ export default function ProductListPage() {
             <h2 className="text-xl font-bold">{item.amount}</h2>
             <p className="text-lg my-2 text-indigo-400 font-semibold">{item.price}</p>
             <button className="bg-indigo-600 text-white px-4 py-2 rounded w-full mt-2">
-              Buy Now
+              BUY NOW!
             </button>
           </div>
         ))}
